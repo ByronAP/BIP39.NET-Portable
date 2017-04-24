@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Linq;
-using System.Text;
 
 namespace Bitcoin.BIP39
 {
@@ -44,10 +42,10 @@ namespace Bitcoin.BIP39
         /// <param name="salt">Salt to be concatenated with the password</param>
         /// <param name="iterations">Number of iterations to perform HMACSHA Hashing for PBKDF2</param>
         public Rfc2898_pbkdf2_hmacsha512(Byte[] password, Byte[] salt, int iterations = CMinIterations)
-        {            
+        {
             P = password;
             S = salt;
-            c = iterations;            
+            c = iterations;
         }
 
         #endregion
@@ -90,7 +88,7 @@ namespace Bitcoin.BIP39
         {
             Rfc2898_pbkdf2_hmacsha512 rfcObj = new Rfc2898_pbkdf2_hmacsha512(P, S, c);
             return rfcObj.GetDerivedKeyBytes_PBKDF2_HMACSHA512(dkLen);
-        }        
+        }
 
         #endregion
 
@@ -103,7 +101,7 @@ namespace Bitcoin.BIP39
             Byte[] Si = Utilities.MergeByteArrays(S, INT(i));
 
             //Initial hash (U_1) using password and salt concatenated with Int(i) as per spec
-            Byte[] temp = PRF(Si,P);
+            Byte[] temp = PRF(Si, P);
 
             //Output block filled with initial hash value or U_1 as per spec
             Byte[] U_c = temp;
@@ -111,7 +109,7 @@ namespace Bitcoin.BIP39
             for (Int32 C = 1; C < c; C++)
             {
                 //rehashing the password using the previous hash value as salt as per spec
-                temp = PRF(temp,P);
+                temp = PRF(temp, P);
 
                 for (Int32 j = 0; j < temp.Length; j++)
                 {
