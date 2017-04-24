@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -89,7 +88,6 @@ namespace Bitcoin.BIP39
         public BIP39(string mnemonicSentence, string passphrase = cEmptyString, Language language=Language.Unknown)
         {
 
-            mnemonicSentence.Trim().Normalize(NormalizationForm.FormKD);
             _mnemonicSentence = Utilities.NormaliseStringNfkd(mnemonicSentence.Trim()); //just making sure we don't have any leading or trailing spaces
             _passphraseBytes = UTF8Encoding.UTF8.GetBytes(Utilities.NormaliseStringNfkd(passphrase));
             string[] words = _mnemonicSentence.Split(new char[] { ' ' });
