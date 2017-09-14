@@ -19,7 +19,7 @@ namespace Bitcoin.BIP39
     {
         #region Private Attributes
 
-        private byte[] _entropyBytes;        
+        private byte[] _entropyBytes;
         private byte[] _passphraseBytes;
         private Language _language;
         private List<int> _wordIndexList; //I made this a property because then we can keep the same index and swap between languages for experimenting
@@ -75,10 +75,10 @@ namespace Bitcoin.BIP39
                 throw (new Exception("entropy bytes must be a multiple of " + (cEntropyMultiple / cBitsInByte) + " (divisible by " + (cEntropyMultiple / cBitsInByte) + " with no remainder) and must be greater than " + ((cMinimumEntropyBits / cBitsInByte) - 1) + " bytes and less than " + ((cMaximumEntropyBits / cBitsInByte) + 1) + " bytes"));
             }
 
-            _entropyBytes = entropyBytes;          
+            _entropyBytes = entropyBytes;
             pInit(passphrase,language);
         }
-       
+
         /// <summary>
         /// Constructor to build a BIP39 object using a supplied Mnemonic sentence and passphrase. If you are not worried about saving the entropy bytes, or using custom words not in a wordlist, you should consider the static method to do this instead.
         /// </summary>
@@ -87,6 +87,7 @@ namespace Bitcoin.BIP39
         /// <param name="language">Optional language to use for wordlist, if not specified it will auto detect language and if it can't detect it will default to English</param>
         public BIP39(string mnemonicSentence, string passphrase = cEmptyString, Language language=Language.Unknown)
         {
+
             _mnemonicSentence = Utilities.NormaliseStringNfkd(mnemonicSentence.Trim()); //just making sure we don't have any leading or trailing spaces
             _passphraseBytes = UTF8Encoding.UTF8.GetBytes(Utilities.NormaliseStringNfkd(passphrase));
             string[] words = _mnemonicSentence.Split(new char[] { ' ' });
@@ -111,7 +112,7 @@ namespace Bitcoin.BIP39
 
             _language = language;
             _wordIndexList = pRebuildWordIndexes(words);
-            _entropyBytes = pProcessIntToBitsThenBytes(_wordIndexList);   
+            _entropyBytes = pProcessIntToBitsThenBytes(_wordIndexList);
         }
 
         #endregion
@@ -144,12 +145,12 @@ namespace Bitcoin.BIP39
             Wordlists.French fr = new Wordlists.French();
             Wordlists.ChineseSimplified cnS = new Wordlists.ChineseSimplified();
             Wordlists.ChineseTraditional cnT = new Wordlists.ChineseTraditional();
-            
+
             List<int> languageCount = new List<int>(new int[] {0,0,0,0,0,0});
             int index;
 
             foreach(string s in words)
-            {               
+            {
                 if(eng.WordExists(s,out index))
                 {
                     //english is at 0
@@ -265,14 +266,14 @@ namespace Bitcoin.BIP39
             _passphraseBytes = UTF8Encoding.UTF8.GetBytes(Utilities.NormaliseStringNfkd(passphrase));
             _language = language;
             byte[] allChecksumBytes = Utilities.Sha256Digest(_entropyBytes,0,_entropyBytes.Length); //sha256 the entropy bytes to get all the checksum bits
-            
+
             _entropyBytes = Utilities.SwapEndianBytes(_entropyBytes); //seems I had to change the endianess of the bytes here to match the test vectors.....
 
             int numberOfChecksumBits = (_entropyBytes.Length * cBitsInByte) / cEntropyMultiple; //number of bits to take from the checksum bits, varies on entropy size as per spec
             BitArray entropyConcatChecksumBits = new BitArray((_entropyBytes.Length * cBitsInByte) + numberOfChecksumBits);
 
-            allChecksumBytes = Utilities.SwapEndianBytes(allChecksumBytes); //yet another endianess change of some different bytes to match the test vectors.....             
-            
+            allChecksumBytes = Utilities.SwapEndianBytes(allChecksumBytes); //yet another endianess change of some different bytes to match the test vectors.....
+
             int index=0;
 
             foreach(bool b in new BitArray(_entropyBytes))
@@ -303,7 +304,7 @@ namespace Bitcoin.BIP39
 
             _wordIndexList = pGetWordIndeces(entropyConcatChecksumBits);
             _mnemonicSentence = pGetMnemonicSentence();
-   
+
         }
 
         /// <summary>
@@ -319,7 +320,7 @@ namespace Bitcoin.BIP39
             }
 
             string mSentence = cEmptyString;
-            Wordlists.Wordlist wordlist;            
+            Wordlists.Wordlist wordlist;
 
             switch(_language)
             {
@@ -359,7 +360,7 @@ namespace Bitcoin.BIP39
                 {
                     mSentence += " ";
                 }
-            }           
+            }
 
             return mSentence;
         }
@@ -381,7 +382,7 @@ namespace Bitcoin.BIP39
                     toInt.Set(i2, entropyConcatChecksumBits.Get(i+i2));
                 }
 
-                wordIndexList.Add(pProcessBitsToInt(toInt)); //adding encoded int to word index               
+                wordIndexList.Add(pProcessBitsToInt(toInt)); //adding encoded int to word index
             }
 
             return wordIndexList;
@@ -439,14 +440,14 @@ namespace Bitcoin.BIP39
 
             foreach(string s in wordsInMnemonicSentence)
             {
-                int idx=-1;                
+                int idx=-1;
 
                 if(!wordlist.WordExists(s, out idx))
                 {
                     throw new Exception("Word "+s+" is not in the wordlist for language " + langName + " cannot continue to rebuild entropy from wordlist");
                 }
 
-                wordIndexList.Add(idx);            
+                wordIndexList.Add(idx);
             }
 
             return wordIndexList;
@@ -477,7 +478,7 @@ namespace Bitcoin.BIP39
                 }
 
                 base2Divide = base2Divide / 2;
-            }            
+            }
 
             return number;
         }
@@ -495,8 +496,8 @@ namespace Bitcoin.BIP39
                 throw new Exception("the wordlist index contains -1 which means words were used in the mnemonic sentence that cannot be found in the wordlist and so the -1 will stuff up our entropy bits and we cannot rebuild the entropy from index containing -1. Perhaps a different language wordlist is needed?");
             }
             BitArray bits = new BitArray(wordIndex.Count * cBitGroupSize);
-            
-            int bitIndex = 0;            
+
+            int bitIndex = 0;
 
             //hey look it's another loop in a loop w00t! I'm sure my old uni lecturer is fizzin' at the bumhole with rage somewhere right now.....it works tho :)
             for(int i=0; i< wordIndex.Count;i++)
@@ -535,7 +536,7 @@ namespace Bitcoin.BIP39
                 bits.Set(bitIndex - (cBitGroupSize - 4), bits.Get(bitIndex - 5));
                 bits.Set(bitIndex - 5, temp);
                 //end bit swappy, rubber fanny haha
-                
+
             }
 
             //now we need to strip the checksum and return entropy bytes
@@ -621,7 +622,7 @@ namespace Bitcoin.BIP39
                 _passphraseBytes = UTF8Encoding.UTF8.GetBytes(Utilities.NormaliseStringNfkd(value));
             }
         }
-        
+
         /// <summary>
         /// Gets the mnemonic sentence built from ent+cs
         /// </summary>
@@ -637,7 +638,7 @@ namespace Bitcoin.BIP39
                     Char.TryParse(cJPSpaceString, out japSpace);
                     outputMnemonic = outputMnemonic.Replace(' ', japSpace);
                 }
-                
+
                 return outputMnemonic;
             }
         }
@@ -684,7 +685,7 @@ namespace Bitcoin.BIP39
             }
         }
 
-        
+
         /// <summary>
         /// Gets a count of the words that the entropy will produce
         /// </summary>

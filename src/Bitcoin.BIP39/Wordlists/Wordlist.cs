@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Bitcoin.BIP39.Wordlists
 {
@@ -25,9 +23,9 @@ namespace Bitcoin.BIP39.Wordlists
         /// <returns>Exists (true/false)</returns>
         public bool WordExists(string word, out int index)
         {
-            if(_words.Contains(word))
+            if (_words.Contains(word))
             {
-                index = Array.IndexOf(_words,word);
+                index = Array.IndexOf(_words, word);
                 return true;
             }
 
@@ -55,6 +53,6 @@ namespace Bitcoin.BIP39.Wordlists
             {
                 return _words.Length;
             }
-        }        
+        }
     }
 }
